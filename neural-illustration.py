@@ -102,4 +102,8 @@ def train(action_buffer=actions, reward_buffer=rewards):
     print(critic_lossval.numpy(), actor_lossval.numpy())
     actor_history.append(actor_lossval.numpy())
     critic_history.append(critic_lossval.numpy())
+
+    if len(action_buffer) > 100:
+        action_buffer = action_buffer[-100:]
+        reward_buffer = reward_buffer[-100:]
     return action_buffer, reward_buffer
