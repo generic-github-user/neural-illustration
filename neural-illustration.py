@@ -77,3 +77,18 @@ def generate(action_buffer=actions, reward_buffer=rewards, log=False, noise=1):
         print(action_buffer)
         print(reward_buffer)
     return action_buffer, reward_buffer, canvas
+
+critic_loss = tf.keras.losses.MeanSquaredError()
+def train(action_buffer=actions, reward_buffer=rewards):
+    for j in range(1):
+        action_buffer, reward_buffer, canvas = generate(action_buffer, reward_buffer)
+    # action_buffer = np.stack(action_buffer)
+    # reward_buffer = np.stack(reward_buffer)
+    # print(action_buffer.shape, reward_buffer.shape)
+
+    with tf.GradientTape() as tape:
+        predictions = critic(action_buffer)
+        critic_lossval = critic_loss(reward_buffer, predictions)
+    critic_grads = tape.gradient(critic_lossval, critic.trainable_weights)
+    critic_optimizer.apply_gradients(zip(critic_grads, critic.trainable_weights))
+    return action_buffer, reward_buffer
