@@ -14,3 +14,19 @@ sample[0:R//3, 0:R//3] = 1
 
 actions = np.zeros((1, (timesteps * 3 + 1)))
 rewards = np.zeros((1, 1))
+
+actor = tf.keras.models.Sequential([
+    # layers.InputLayer(input_shape=(1)),
+    # layers.Dense(1, batch_input_shape=(1,)),
+    layers.Dense(1),
+    layers.RepeatVector(timesteps),
+    layers.Dense(10, activation='tanh'),
+    layers.LSTM(10, stateful=False, return_sequences=True),
+    layers.Dense(10, activation='tanh'),
+    # layers.Dense(5, activation='tanh'),
+    # layers.BatchNormalization(),
+    layers.Dense(3, activation='tanh'),
+    layers.Rescaling(10),
+    # layers.LayerNormalization()
+    layers.Flatten()
+])
