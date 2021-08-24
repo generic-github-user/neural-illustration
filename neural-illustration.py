@@ -30,3 +30,12 @@ actor = tf.keras.models.Sequential([
     # layers.LayerNormalization()
     layers.Flatten()
 ])
+
+critic = tf.keras.models.Sequential([
+    # layers.Dense(4),
+    layers.BatchNormalization(),
+    layers.Dense(16, activation='tanh'),
+    # layers.Dense(10, activation='tanh'),
+    layers.Dense(10, activation='tanh'),
+    layers.Dense(1, activation='relu')
+])
