@@ -57,6 +57,8 @@ def generate(action_buffer=actions, reward_buffer=rewards, log=False, noise=1):
     # action_noise[::3] = np.random.normal(0, 0.5, [5])
     action_noise *= noise
     outputs[0] += action_noise
+    if log:
+        print(outputs)
     for timestep in np.split((outputs[0]), timesteps):
         x, y, r = timestep
         r = np.abs(r)
@@ -71,4 +73,7 @@ def generate(action_buffer=actions, reward_buffer=rewards, log=False, noise=1):
     canvas /= canvas.max()
     action_buffer = np.append(action_buffer, state_vector, axis=0)
     reward_buffer = np.append(reward_buffer, np.mean(np.abs(canvas - sample) ** 1)[None, ..., None], axis=0)
+    if log:
+        print(action_buffer)
+        print(reward_buffer)
     return action_buffer, reward_buffer, canvas
