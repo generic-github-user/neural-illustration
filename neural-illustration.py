@@ -91,4 +91,15 @@ def train(action_buffer=actions, reward_buffer=rewards):
         critic_lossval = critic_loss(reward_buffer, predictions)
     critic_grads = tape.gradient(critic_lossval, critic.trainable_weights)
     critic_optimizer.apply_gradients(zip(critic_grads, critic.trainable_weights))
+
+    goal_rewards = np.zeros((len(action_buffer), 1))
+    with tf.GradientTape() as tape:
+        inputs = np.ones((1, 1))
+        predictions = critic(tf.concat([inputs, actor(inputs)], axis=1))
+        actor_lossval = critic_loss(goal_rewards, predictions)
+    actor_grads = tape.gradient(actor_lossval, actor.trainable_weights)
+    actor_optimizer.apply_gradients(zip(actor_grads, actor.trainable_weights))
+    print(critic_lossval.numpy(), actor_lossval.numpy())
+    actor_history.append(actor_lossval.numpy())
+    critic_history.append(critic_lossval.numpy())
     return action_buffer, reward_buffer
