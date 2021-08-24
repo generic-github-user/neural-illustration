@@ -107,3 +107,27 @@ def train(action_buffer=actions, reward_buffer=rewards):
         action_buffer = action_buffer[-100:]
         reward_buffer = reward_buffer[-100:]
     return action_buffer, reward_buffer
+
+generate(actions, rewards, log=True, noise=0)
+plt.ion()
+fig, ax = plt.subplots(1, 3)
+fig.set_size_inches((10, 5))
+plt.style.use('fivethirtyeight')
+for k in range(200):
+    # fig.clear()
+    # plt.clf()
+    for a in ax:
+        a.clear()
+    ax[0].imshow(sample)
+    for i, sub in enumerate(ax[1:2]):
+        for i in range(10):
+            actions, rewards = train(actions, rewards)
+        actions, rewards, result = generate(actions, rewards, noise=i%2)
+        print(result.min())
+        sub.imshow(result)
+    ax[2].plot(actor_history)
+    ax[2].plot(critic_history)
+    plt.pause(0.05)
+    plt.show()
+# TODO: interactive training interface
+input()
