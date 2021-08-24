@@ -39,3 +39,36 @@ critic = tf.keras.models.Sequential([
     layers.Dense(10, activation='tanh'),
     layers.Dense(1, activation='relu')
 ])
+
+actor_optimizer = optimizers.Adam(learning_rate=0.0003)
+critic_optimizer = optimizers.Adam(learning_rate=0.0004)
+actor_history = []
+critic_history = []
+
+def generate(action_buffer=actions, reward_buffer=rewards, log=False, noise=1):
+    # actor.reset_states()
+    canvas = np.zeros(resolution)
+    grid = np.stack(np.mgrid[-10:10:complex(imag=R), -10:10:complex(imag=R)])
+    inputs = np.ones((1, 1))
+    outputs = actor(inputs).numpy()
+    # for timestep in outputs[0]:
+        # print(timestep)
+    action_noise = np.random.normal(0, 2, [timesteps * 3])
+    # action_noise[::3] = np.random.normal(0, 0.5, [5])
+    action_noise *= noise
+    outputs[0] += action_noise
+    for timestep in np.split((outputs[0]), timesteps):
+        x, y, r = timestep
+        r = np.abs(r)
+        brush = np.linalg.norm(grid - np.array([x, y])[..., None, None], ord=2, axis=0)# < 2
+        # canvas += brush
+        # canvas = np.where(brush, 1, canvas)
+        canvas += (1 / (brush * 0.2)) ** 0.01
+        # canvas += (10 - brush) ** 2
+    state_vector = np.concatenate([inputs, outputs], axis=1)
+    # print(state_vector.shape)
+    canvas -= canvas.min()
+    canvas /= canvas.max()
+    action_buffer = np.append(action_buffer, state_vector, axis=0)
+    reward_buffer = np.append(reward_buffer, np.mean(np.abs(canvas - sample) ** 1)[None, ..., None], axis=0)
+    return action_buffer, reward_buffer, canvas
